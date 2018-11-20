@@ -4,21 +4,20 @@
 /*---Move Up---*/
 
 jon_snow(X,Y,D,result(up,S)):-
-  jon_snow(X,OY,_,S),
-  OY > 0,
-  Y is OY -1,
-  \+ obstacle(X,Y),
-  \+ white_walker(X,Y,S),
-  dragon_stone(X,Y,D).
+    jon_snow(X,OY,_,S),
+    OY > 0,
+    Y is OY -1,
+    \+ obstacle(X,Y),
+    \+ white_walker(X,Y,S),
+    dragon_stone(X,Y,D).
 
 jon_snow(X,Y,D,result(up,S)):-
-  jon_snow(X,OY,D,S),
-  OY > 0,
-  Y is OY -1,
-  \+ obstacle(X,Y),
-  \+ white_walker(X,Y,S),
-  \+ dragon_stone(X,Y,_).
-
+    jon_snow(X,OY,D,S),
+    OY > 0,
+    Y is OY -1,
+    \+ obstacle(X,Y),
+    \+ white_walker(X,Y,S),
+    \+ dragon_stone(X,Y,_).
 
 /*---Move Down---*/
 
@@ -60,7 +59,6 @@ jon_snow(X,Y,D,result(left,S)):-
     \+ white_walker(X,Y,S),
     \+ dragon_stone(X,Y,_).
 
-
 /*---Move Right---*/
 
 jon_snow(X,Y,D,result(right,S)):-
@@ -82,7 +80,6 @@ jon_snow(X,Y,D,result(right,S)):-
     \+ obstacle(X,Y),
     \+ white_walker(X,Y,S),
     \+ dragon_stone(X,Y,_).
-
 
 /*---Attack---*/
 jon_snow(X,Y,D,result(attack,S)):-
@@ -116,24 +113,37 @@ jon_snow(X,Y,D,result(attack,S)):-
 
 /*---White_walkers---*/
 white_walker(_,_,result(A,S)):-
-  A \= attack.
+    A \= attack.
 
 white_walker(X,Y,result(attack,S)):-
-      LX is X-1,
-      RX is X+1,
-      UY is Y-1,
-      DY is Y+1,
-      \+ jon_snow(LX,Y,_,S),
-      \+ jon_snow(RX,Y,_,S),
-      \+ jon_snow(X,UY,_,S),
-      \+ jon_snow(X,DY,_,S).
+    LX is X-1,
+    RX is X+1,
+    UY is Y-1,
+    DY is Y+1,
+    \+ jon_snow(LX,Y,_,S),
+    \+ jon_snow(RX,Y,_,S),
+    \+ jon_snow(X,UY,_,S),
+    \+ jon_snow(X,DY,_,S).
 
+dead_white_walker(X,Y,result(attack,S)):-
+    white_walker(X,Y,S),
+    LX is X-1,
+    RX is X+1,
+    UY is Y-1,
+    DY is Y+1,
+    (
+    jon_snow(LX,Y,_,S);
+    jon_snow(RX,Y,_,S);
+    jon_snow(X,UY,_,S);
+    jon_snow(X,DY,_,S)
+    ).
 
-
-query(S):-
-  \+ white_walker(0,1,S).
-
+dead_white_walker(X,Y,result(_,S)):-
+    dead_white_walker(X,Y,S).
 
 /*---Querying---*/
+query(S):-
+    foreach(white_walker(X,Y,s),dead_white_walker(X,Y,S)).
+
 query_with_depth(L,N,S):-
-  call_with_depth_limit(query(S),N,L).
+    call_with_depth_limit(query(S),N,L).
