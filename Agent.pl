@@ -1,5 +1,6 @@
 :- include('KB.pl').
 
+/*---Move Up---*/
 
 jon_snow(X,Y,D,result(up,S)):-
     jon_snow(X,OY,_,S),
@@ -47,7 +48,7 @@ jon_snow(X,Y,D,result(left,S)):-
     X is OX -1,
     \+ obstacle(X,Y),
     \+ white_walker(X,Y,S),
-      dragon_stone(X,Y,D).
+    dragon_stone(X,Y,D).
 
 jon_snow(X,Y,D,result(left,S)):-
     jon_snow(OX,Y,D,S),
@@ -113,10 +114,12 @@ jon_snow(X,Y,D,result(attack,S)):-
 /*---White_walkers---*/
 white_walker(X,Y,result(A,S)):-
     white_walker(X,Y,S),
-    (A = up;
+    (
+    A = up;
     A = down;
     A = right;
-    A= left).
+    A= left
+    ).
 
 white_walker(X,Y,result(attack,S)):-
     white_walker(X,Y,S),
@@ -144,12 +147,14 @@ dead_white_walker(X,Y,result(attack,S)):-
     D>0.
 
 dead_white_walker(X,Y,result(A,S)):-
-    (A = up;
+    dead_white_walker(X,Y,S),
+    (
+    A = up;
     A = down;
     A = right;
     A = left;
-    A = attack),
-    dead_white_walker(X,Y,S).
+    A = attack
+    ).
 
 /*---Querying---*/
 query(S):-
