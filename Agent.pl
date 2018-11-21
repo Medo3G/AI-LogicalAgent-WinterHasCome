@@ -1,8 +1,6 @@
 :- include('KB.pl').
 
 
-/*---Move Up---*/
-
 jon_snow(X,Y,D,result(up,S)):-
     jon_snow(X,OY,_,S),
     OY > 0,
@@ -84,6 +82,7 @@ jon_snow(X,Y,D,result(right,S)):-
 /*---Attack---*/
 jon_snow(X,Y,D,result(attack,S)):-
     jon_snow(X,Y,OD,S),
+    \+ dragon_stone(X,Y,_),
     OD > 0,
     D is OD -1,
     LX is X-1,
@@ -112,10 +111,15 @@ jon_snow(X,Y,D,result(attack,S)):-
     ).
 
 /*---White_walkers---*/
-white_walker(_,_,result(A,S)):-
-    A \= attack.
+white_walker(X,Y,result(A,S)):-
+    white_walker(X,Y,S),
+    (A = up;
+    A = down;
+    A = right;
+    A= left).
 
 white_walker(X,Y,result(attack,S)):-
+    white_walker(X,Y,S),
     LX is X-1,
     RX is X+1,
     UY is Y-1,
@@ -132,13 +136,19 @@ dead_white_walker(X,Y,result(attack,S)):-
     UY is Y-1,
     DY is Y+1,
     (
-    jon_snow(LX,Y,_,S);
-    jon_snow(RX,Y,_,S);
-    jon_snow(X,UY,_,S);
-    jon_snow(X,DY,_,S)
-    ).
+    jon_snow(LX,Y,D,S);
+    jon_snow(RX,Y,D,S);
+    jon_snow(X,UY,D,S);
+    jon_snow(X,DY,D,S)
+    ),
+    D>0.
 
-dead_white_walker(X,Y,result(_,S)):-
+dead_white_walker(X,Y,result(A,S)):-
+    (A = up;
+    A = down;
+    A = right;
+    A = left;
+    A = attack),
     dead_white_walker(X,Y,S).
 
 /*---Querying---*/
