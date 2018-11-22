@@ -1,5 +1,6 @@
 :- include('KB.pl').
 
+
 /*---Move Up---*/
 
 jon_snow(X,Y,D,result(up,S)):-
@@ -160,5 +161,16 @@ dead_white_walker(X,Y,result(A,S)):-
 query(S):-
     foreach(white_walker(X,Y,s),dead_white_walker(X,Y,S)).
 
-query_with_depth(L,N,S):-
-    call_with_depth_limit(query(S),N,L).
+query_with_depth(S,N,L):-
+    (
+    call_with_depth_limit(query(S),N,L),
+    \+ L = depth_limit_exceeded
+    );
+    (
+    F is N+1,
+    query_with_depth(S,F,L)
+    ).
+    
+
+start(S):-
+    query_with_depth(S,0,_).
